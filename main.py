@@ -9,19 +9,19 @@ def lambda_handler(event, context):
         ]
 
         conn = pymysql.connect(
-            host='your-rds-endpoint',
-            user='yourusername',
-            password='yourpassword',
-            database='yourdatabase',
+            host='task_rds',
+            user='vishwesh',
+            password='vishwesh',
+            database='task_db',
             port=3306,
             cursorclass=pymysql.cursors.DictCursor
         )
         
         cursor = conn.cursor()
-        cursor.execute(""" CREATE TABLE IF NOT EXISTS your_table ( id SERIAL PRIMARY KEY, name VARCHAR(255), age INTEGER) """)
+        cursor.execute(""" CREATE TABLE IF NOT EXISTS Task ( id SERIAL PRIMARY KEY, name VARCHAR(255), age INTEGER) """)
 
         for row in data:
-            cursor.execute(""" INSERT INTO your_table (name, age) VALUES (%s, %s) """, (row['name'], row['age']))
+            cursor.execute(""" INSERT INTO task (name, age) VALUES (%s, %s) """, (row['name'], row['age']))
         
         conn.commit()
         
