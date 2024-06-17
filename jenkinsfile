@@ -2,7 +2,7 @@ pipeline {
     agent any
     
     environment {
-        AWS_DEFAULT_REGION = 'ap-south-2'
+        AWS_DEFAULT_REGION = 'ap-south-1'
         AWS_ACCESS_KEY_ID = credentials('AKIAXYKJSPFI7754BQ7E') 
         AWS_SECRET_ACCESS_KEY = credentials('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')
     }
@@ -42,7 +42,7 @@ pipeline {
         stage('Login to ECR') {
             steps {
                 script {
-                    sh "aws ecr get-login-password --region ap-south-2 | docker login --username AWS --password-stdin ${ECR_REPO_URL}"
+                    sh "aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin ${ECR_REPO_URL}"
                 }
             }
         }
