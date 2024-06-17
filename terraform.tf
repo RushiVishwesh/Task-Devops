@@ -1,7 +1,7 @@
 provider "aws" {
   region     = "ap-south-1"
-  access_key = var.aws_access_key
-  secret_key = var.aws_secret_key
+  access_key = "AKIAXYKJSPFI7754BQ7E"
+  secret_key = "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"
 }
 
 resource "aws_s3_bucket" "task_s3" {
@@ -23,7 +23,6 @@ resource "aws_db_instance" "task_rds" {
   skip_final_snapshot    = true
 }
 
-# Define the IAM role for Lambda function
 resource "aws_iam_role" "task_lambda" {
   name = "task_lambda"
 
@@ -44,7 +43,6 @@ resource "aws_iam_policy_attachment" "lambda_rds_access" {
   roles      = [aws_iam_role.task_lambda.name]
 }
 
-# Create an ECR repository
 resource "aws_ecr_repository" "lambda_repository" {
   name = "lambda-repository"
 }
@@ -62,15 +60,14 @@ resource "aws_lambda_function" "your_lambda_function" {
   }
   environment {
     variables = {
-      DB_HOST     = aws_db_instance.task_rds.endpoint
-      DB_NAME     = aws_db_instance.task_rds.name
-      DB_USERNAME = aws_db_instance.task_rds.username
-      DB_PASSWORD = aws_db_instance.task_rds.password
+      DB_HOST     = aws_db_instance.task_rds.task_rds
+      DB_NAME     = aws_db_instance.task_rds.task_db
+      DB_USERNAME = aws_db_instance.task_rds.vishwesh
+      DB_PASSWORD = aws_db_instance.task_rds.vishwesh
     }
   }
 }
 
-# Output the Lambda function name
 output "lambda_function_name" {
   value = aws_lambda_function.your_lambda_function.function_name
 }
