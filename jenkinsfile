@@ -1,11 +1,6 @@
 pipeline {
     agent any
     
-    environment {
-        AWS_DEFAULT_REGION = 'ap-south-2'
-        AWS_ACCESS_KEY_ID = credentials('AKIAXYKJSPFI7754BQ7E') 
-        AWS_SECRET_ACCESS_KEY = credentials('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')
-    }
     
     stages {
         stage('Checkout') {
