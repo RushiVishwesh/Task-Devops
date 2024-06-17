@@ -1,0 +1,64 @@
+pipeline {
+    agent any
+    
+    environment {
+        AWS_DEFAULT_REGION = 'ap-south-1'
+        AWS_ACCESS_KEY_ID = credentials('AKIAXYKJSPFI7754BQ7E') 
+        AWS_SECRET_ACCESS_KEY = credentials('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')
+    }
+    
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+        
+        stage('Terraform Init') {
+            steps {
+                dir("${TF_WORKSPACE}") {
+                    script {
+                        sh 'terraform init'
+                    }
+                }
+            }
+        }
+        
+        stage('Terraform Apply') {
+            steps {
+                dir("${TF_WORKSPACE}") {
+                    script {
+                        sh 'terraform apply -auto-approve'
+                    }
+                }
+            }
+        }
+        
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    def dockerImage = docker.build("lambda-repository:${env.BUILD_NUMBER}")
+                    dockerImage.push()
+                }
+            }
+        }
+        
+        stage('Login to ECR') {
+            steps {
+                script {
+                    sh "aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin ${ECR_REPO_URL}"
+                }
+            }
+        }
+        
+        stage('Push to ECR') {
+            steps {
+                script {
+                    def dockerImage = docker.image("lambda-repository:${env.BUILD_NUMBER}")
+                    dockerImage.tag("${ECR_REPO_URL}:latest")
+                    dockerImage.push("${ECR_REPO_URL}:latest")
+                }
+            }
+        }
+    }
+}
