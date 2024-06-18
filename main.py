@@ -9,10 +9,10 @@ def lambda_handler(event, context):
         ]
 
         conn = pymysql.connect(
-            host='task_rds',
-            user='vishwesh',
-            password='vishwesh',
-            database='task_db',
+            host=os.environ['DB_HOST'],
+            user=os.environ['DB_USERNAME'],
+            password=os.environ['DB_PASSWORD'],
+            database=os.environ['DB_NAME'],
             port=3306,
             cursorclass=pymysql.cursors.DictCursor
         )
