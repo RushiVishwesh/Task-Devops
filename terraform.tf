@@ -59,10 +59,10 @@ resource "aws_lambda_function" "your_lambda_function" {
   }
   environment {
     variables = {
-      DB_HOST     = aws_db_instance.task_rds.endpoint   // Correctly accessing endpoint attribute
-      DB_NAME     = aws_db_instance.task_rds.identifier // Correctly accessing identifier (or use db_name attribute if defined)
-      DB_USERNAME = aws_db_instance.task_rds.username   // Correctly accessing username attribute
-      DB_PASSWORD = aws_db_instance.task_rds.password   // Correctly accessing password attribute
+      DB_HOST     = aws_db_instance.task_rds.endpoint 
+      DB_NAME     = aws_db_instance.task_rds.identifier 
+      DB_USERNAME = aws_db_instance.task_rds.username  
+      DB_PASSWORD = aws_db_instance.task_rds.password  
     }
   }
 }
