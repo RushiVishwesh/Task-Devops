@@ -6,17 +6,15 @@ provider "aws" {
 
 resource "aws_s3_bucket" "task_s3" {
   bucket = "task_s3"
-  acl    = "private"
 }
 
 resource "aws_db_instance" "task_rds" {
-  identifier             = "task_rds"
+  identifier             = "task_db"
   allocated_storage      = 10
   storage_type           = "gp2"
   engine                 = "mysql"
   engine_version         = "8.0"
   instance_class         = "db.t2.micro"
-  name                   = "task_db"
   username               = "vishwesh"
   password               = "vishwesh"
   publicly_accessible    = false
@@ -39,8 +37,9 @@ resource "aws_iam_role" "task_lambda" {
 }
 
 resource "aws_iam_policy_attachment" "lambda_rds_access" {
-  policy_arn = "arn:aws:iam::aws:policy/AmazonRDSFullAccess"
-  roles      = [aws_iam_role.task_lambda.name]
+  name        = "lambda-rds-access"
+  policy_arn  = "arn:aws:iam::aws:policy/AmazonRDSFullAccess"
+  roles       = [aws_iam_role.task_lambda.name]
 }
 
 resource "aws_ecr_repository" "lambda_repository" {
@@ -60,10 +59,10 @@ resource "aws_lambda_function" "your_lambda_function" {
   }
   environment {
     variables = {
-      DB_HOST     = aws_db_instance.task_rds.task_rds
-      DB_NAME     = aws_db_instance.task_rds.task_db
-      DB_USERNAME = aws_db_instance.task_rds.vishwesh
-      DB_PASSWORD = aws_db_instance.task_rds.vishwesh
+      DB_HOST     = aws_db_instance.task_rds.address
+      DB_NAME     = aws_db_instance.task_rds.name
+      DB_USERNAME = aws_db_instance.task_rds.username
+      DB_PASSWORD = aws_db_instance.task_rds.password
     }
   }
 }
