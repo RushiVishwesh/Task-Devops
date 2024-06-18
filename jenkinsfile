@@ -1,27 +1,34 @@
 pipeline {
     agent any
     
+    environment {
+        AWS_REGION = 'ap-south-2' 
+    }
     
     stages {
         stage('Checkout') {
             steps {
-                checkout scm
+                git 'https://github.com/RushiVishwesh/task-devops.git'
             }
         }
         
-        stage('Terraform Init') {
+        stage('Terraform Init & Apply') {
             steps {
-                 script {
+                dir("task-devops") {
+                    script {
                         sh 'terraform init'
+                        sh 'terraform apply -auto-approve'
+                    }
                 }
             }
         }
         
-        stage('Terraform Apply') {
+        stage('Retrieve ECR URL') {
             steps {
-                    script {
-                        sh 'terraform apply -auto-approve'
-                 }
+                script {
+                    def ecrUrl = sh(script: 'terraform output ecr_url', returnStdout: true).trim()
+                    env.ECR_REPO_URL = ecrUrl
+                }
             }
         }
         
@@ -37,7 +44,7 @@ pipeline {
         stage('Login to ECR') {
             steps {
                 script {
-                    sh "aws ecr get-login-password --region ap-south-2 | docker login --username AWS --password-stdin ${ECR_REPO_URL}"
+                    sh "aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${env.ECR_REPO_URL}"
                 }
             }
         }
@@ -46,8 +53,8 @@ pipeline {
             steps {
                 script {
                     def dockerImage = docker.image("lambda-repository:${env.BUILD_NUMBER}")
-                    dockerImage.tag("${ECR_REPO_URL}:latest")
-                    dockerImage.push("${ECR_REPO_URL}:latest")
+                    dockerImage.tag("${env.ECR_REPO_URL}:latest")
+                    dockerImage.push("${env.ECR_REPO_URL}:latest")
                 }
             }
         }
